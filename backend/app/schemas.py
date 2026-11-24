@@ -9,7 +9,7 @@ class AnalyzeRequest(BaseModel):
 
 class ExecuteRequest(AnalyzeRequest):
     input: str = ""
-    timeout_ms: int = Field(default=3000, ge=100, le=10000)
+    timeout_ms: int = Field(default=10000, ge=100, le=10000)
 
 
 class BenchmarkRequest(AnalyzeRequest):

@@ -1,5 +1,6 @@
 import os
 import json
+import importlib.util
 import subprocess
 import sys
 import tempfile
@@ -14,6 +15,17 @@ def execute_python(source: str, stdin: str = "", timeout_ms: int = 3000) -> dict
         and os.path.isdir(path)
         and os.path.basename(path).lower() in {"site-packages", "dist-packages"}
     ]
+    for package in ("numpy", "pandas", "requests", "sympy"):
+        spec = importlib.util.find_spec(package)
+        if spec and spec.submodule_search_locations:
+            package_paths.extend(
+                os.path.dirname(location)
+                for location in spec.submodule_search_locations
+                if os.path.isdir(location)
+            )
+        elif spec and spec.origin:
+            package_paths.append(os.path.dirname(spec.origin))
+    package_paths = list(dict.fromkeys(package_paths))
 
     with tempfile.TemporaryDirectory(prefix="cca-") as directory:
         path = os.path.join(directory, "main.py")

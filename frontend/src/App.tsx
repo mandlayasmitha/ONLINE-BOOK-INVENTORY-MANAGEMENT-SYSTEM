@@ -26,6 +26,7 @@ type RuntimePackage = {
   name: string
   import_statement: string
   version: string
+  available: boolean
 }
 
 function App() {
@@ -118,7 +119,7 @@ function App() {
                 <Editor height="420px" language="python" value={source} theme={theme} onChange={(value) => setSource(value || '')} options={{ minimap: { enabled: false }, fontSize: 14 }} />
                 <div className="package-bar">
                   <span>{packageError || 'Available imports'}</span>
-                  {packages.map((item) => <button key={item.name} title={`${item.import_statement} (v${item.version})`} onClick={() => addImport(item.import_statement)}>{item.name}</button>)}
+                  {packages.map((item) => <button key={item.name} disabled={!item.available} title={item.available ? `${item.import_statement} (v${item.version})` : 'Not installed on the API runtime'} onClick={() => addImport(item.import_statement)}>{item.name}{item.available ? '' : ' unavailable'}</button>)}
                 </div>
               </div>
               <aside className="analysis-card">

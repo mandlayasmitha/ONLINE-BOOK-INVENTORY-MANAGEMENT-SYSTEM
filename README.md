@@ -27,6 +27,8 @@ py -m venv .venv
 
 API docs: http://localhost:8000/docs
 
+The Python compiler runtime includes NumPy, pandas, requests, and SymPy. Use the package chips in the editor to insert the matching import statement.
+
 ### Frontend
 
 ```powershell

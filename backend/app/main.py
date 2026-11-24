@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import importlib.util
 from .schemas import AnalyzeRequest, ExecuteRequest, BenchmarkRequest
 from .static_analyzer import analyze
 from .execution import execute_python
@@ -34,7 +35,15 @@ def health():
 
 @app.get("/api/packages")
 def packages():
-    return {"packages": RUNTIME_PACKAGES}
+    return {
+        "packages": [
+            {
+                **package,
+                "available": importlib.util.find_spec(package["name"]) is not None,
+            }
+            for package in RUNTIME_PACKAGES
+        ]
+    }
 
 
 @app.post("/api/analyze/static")
