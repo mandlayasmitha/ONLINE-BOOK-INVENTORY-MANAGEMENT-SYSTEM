@@ -1,4 +1,4 @@
-# CodeComplexity Analyzer
+# Venu Compiler
 
 A full-stack educational code playground with Python execution, static complexity analysis, hybrid analysis, and benchmark visualization.
 

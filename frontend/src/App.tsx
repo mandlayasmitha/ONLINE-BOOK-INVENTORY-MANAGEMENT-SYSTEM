@@ -60,13 +60,13 @@ function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">C</span><span>Complexity</span></div>
+        <div className="brand"><span className="brand-mark">V</span><span>Venu Compiler</span></div>
         <nav>{nav.map((item) => <button key={item} className={active === item ? 'nav-item active' : 'nav-item'} onClick={() => setActive(item)}>{item}</button>)}</nav>
         <button className="theme-toggle" onClick={() => setTheme(theme === 'vs-dark' ? 'light' : 'vs-dark')}>{theme === 'vs-dark' ? 'Light mode' : 'Dark mode'}</button>
       </aside>
       <main>
         <header className="topbar">
-          <div><p className="eyebrow">CODECOMPLEXITY ANALYZER</p><h1>{active}</h1></div>
+          <div><p className="eyebrow">VENU COMPILER</p><h1>{active}</h1></div>
           <div className="top-actions">
             <select aria-label="Programming language"><option>Python 3</option></select>
             <button className="secondary" onClick={() => setSource(defaultCode)}>Reset</button>

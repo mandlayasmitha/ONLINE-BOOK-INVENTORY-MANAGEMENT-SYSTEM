@@ -6,7 +6,7 @@ from .execution import execute_python
 import statistics
 
 
-app = FastAPI(title="CodeComplexity Analyzer", version="1.0.0")
+app = FastAPI(title="Venu Compiler", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

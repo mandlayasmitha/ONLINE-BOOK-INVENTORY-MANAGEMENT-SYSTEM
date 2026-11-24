@@ -1,4 +1,4 @@
-# Architecture
+# Venu Compiler Architecture
 
 ## Components
 
