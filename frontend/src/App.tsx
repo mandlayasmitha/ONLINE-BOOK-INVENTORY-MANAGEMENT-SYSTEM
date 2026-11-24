@@ -4,7 +4,7 @@ import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import './App.css'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API = (import.meta.env.VITE_API_URL || 'https://codecomplexity-api.vercel.app').replace(/\/$/, '')
 const defaultCode = `def fib(n):
     if n <= 1:
         return n
