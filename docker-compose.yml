@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-}
+      JWT_SECRET: ${JWT_SECRET:-development-only-secret}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-codecomplexity}
+      POSTGRES_USER: ${POSTGRES_USER:-cca}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    ports:
+      - "5432:5432"
