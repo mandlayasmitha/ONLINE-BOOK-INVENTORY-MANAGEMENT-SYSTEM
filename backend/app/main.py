@@ -5,6 +5,13 @@ from .static_analyzer import analyze
 from .execution import execute_python
 import statistics
 
+RUNTIME_PACKAGES = [
+    {"name": "numpy", "import_statement": "import numpy as np", "version": "2.2.6"},
+    {"name": "pandas", "import_statement": "import pandas as pd", "version": "2.2.3"},
+    {"name": "requests", "import_statement": "import requests", "version": "2.32.3"},
+    {"name": "sympy", "import_statement": "import sympy", "version": "1.14.0"},
+]
+
 
 app = FastAPI(title="Venu Compiler", version="1.0.0")
 app.add_middleware(
@@ -23,6 +30,11 @@ app.add_middleware(
 @app.get("/api/health")
 def health():
     return {"status": "ok", "security": "development mode"}
+
+
+@app.get("/api/packages")
+def packages():
+    return {"packages": RUNTIME_PACKAGES}
 
 
 @app.post("/api/analyze/static")

@@ -1,14 +1,19 @@
 import os
-import shutil
+import json
 import subprocess
+import sys
 import tempfile
 import time
 
 
 def execute_python(source: str, stdin: str = "", timeout_ms: int = 3000) -> dict:
-    python = shutil.which("python") or shutil.which("python3")
-    if not python:
-        return {"status": "error", "stdout": "", "stderr": "Python runtime is unavailable.", "exitCode": None, "executionTimeMs": 0, "memoryMb": None, "security": "Development adapter"}
+    python = sys.executable
+    package_paths = [
+        path for path in sys.path
+        if os.path.isabs(path)
+        and os.path.isdir(path)
+        and os.path.basename(path).lower() in {"site-packages", "dist-packages"}
+    ]
 
     with tempfile.TemporaryDirectory(prefix="cca-") as directory:
         path = os.path.join(directory, "main.py")
@@ -17,13 +22,26 @@ def execute_python(source: str, stdin: str = "", timeout_ms: int = 3000) -> dict
         started = time.perf_counter()
         try:
             result = subprocess.run(
-                [python, "-I", "-B", path],
+                [
+                    python,
+                    "-I",
+                    "-B",
+                    "-c",
+                    "import json, os, runpy, sys; "
+                    "sys.path.extend(json.loads(os.environ['CCA_SITE_PACKAGES'])); "
+                    "runpy.run_path(sys.argv[1], run_name='__main__')",
+                    path,
+                ],
                 input=stdin,
                 capture_output=True,
                 text=True,
                 timeout=timeout_ms / 1000,
                 cwd=directory,
-                env={"PATH": os.environ.get("PATH", ""), "PYTHONIOENCODING": "utf-8"},
+                env={
+                    "PATH": os.environ.get("PATH", ""),
+                    "PYTHONIOENCODING": "utf-8",
+                    "CCA_SITE_PACKAGES": json.dumps(package_paths),
+                },
             )
             elapsed = round((time.perf_counter() - started) * 1000, 2)
             return {

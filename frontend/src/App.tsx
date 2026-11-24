@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Editor from '@monaco-editor/react'
 import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -22,6 +22,12 @@ type Analysis = {
   findings: Array<{ line: number; kind: string; explanation: string; complexity: string }>
 }
 
+type RuntimePackage = {
+  name: string
+  import_statement: string
+  version: string
+}
+
 function App() {
   const [source, setSource] = useState(defaultCode)
   const [input, setInput] = useState('')
@@ -31,6 +37,26 @@ function App() {
   const [active, setActive] = useState('Playground')
   const [busy, setBusy] = useState(false)
   const [theme, setTheme] = useState<'vs-dark' | 'light'>('vs-dark')
+  const [packages, setPackages] = useState<RuntimePackage[]>([])
+  const [packageError, setPackageError] = useState('')
+
+  useEffect(() => {
+    axios.get(`${API}/api/packages`)
+      .then((response) => setPackages(response.data.packages))
+      .catch(() => setPackageError('Could not load available packages.'))
+  }, [])
+
+  function addImport(statement: string) {
+    if (source.split('\n').includes(statement)) return
+
+    const futureImports = [...source.matchAll(/^from __future__ import .+$/gm)]
+    const insertAt = futureImports.length
+      ? futureImports[futureImports.length - 1].index! + futureImports[futureImports.length - 1][0].length
+      : 0
+    const prefix = source.slice(0, insertAt)
+    const suffix = source.slice(insertAt)
+    setSource(`${prefix}${prefix && !prefix.endsWith('\n') ? '\n' : ''}${statement}\n${suffix}`)
+  }
 
   async function run() {
     setBusy(true)
@@ -90,6 +116,10 @@ function App() {
               <div className="editor-card">
                 <div className="panel-heading"><strong>main.py</strong><span>Python 3</span></div>
                 <Editor height="420px" language="python" value={source} theme={theme} onChange={(value) => setSource(value || '')} options={{ minimap: { enabled: false }, fontSize: 14 }} />
+                <div className="package-bar">
+                  <span>{packageError || 'Available imports'}</span>
+                  {packages.map((item) => <button key={item.name} title={`${item.import_statement} (v${item.version})`} onClick={() => addImport(item.import_statement)}>{item.name}</button>)}
+                </div>
               </div>
               <aside className="analysis-card">
                 <div className="panel-heading"><strong>Complexity Analysis</strong><span>{analysis?.confidence || 'Ready'}</span></div>
